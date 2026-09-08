@@ -1,15 +1,15 @@
 // Function return value types
 
-function add(a: number,b: number): number {
-    return a+b;
+function add(a: number, b: number): number {
+  return a + b;
 }
 
 // it can be usually inferred using the return type it sees
 
 // void type
 
-function log(message: string):void{
-    console.log(message);
+function log(message: string): void {
+  console.log(message);
 }
 
 // returns nothing, you don't need to set it, as it is inferred, but it's important to know about this void type here because it's a special type which you use in combination
@@ -22,9 +22,9 @@ function log(message: string):void{
 
 // the "never" type
 
-function logAndThrow(errorMessage: string): never{
-    console.log(errorMessage);
-    throw new Error(errorMessage);
+function logAndThrow(errorMessage: string): never {
+  console.log(errorMessage);
+  throw new Error(errorMessage);
 }
 
 /* Now the return type of that function is interesting, because it is void, But you could override it to never
@@ -56,6 +56,37 @@ and if you then try to use that and try to access some property or anything like
 and if you create a function that froze an error and that will therefore never return an error, you might just set theat return type here
 to make sure that this function can never be used somewhere where a value is expected or anything like that.
 
-
-
 */
+
+// Functions as Types
+
+// function performJob(cb: Function) {
+//   // ...
+//   cb();
+// }
+
+// or
+
+function performJob(cb: (m: string) => void) {
+  // ...
+  cb("Job Done!");
+}
+
+performJob(log);
+
+// dealing with objects and methods
+
+type User = {
+  name: string;
+  age: number;
+  greet: () => string;
+};
+
+let user: User = {
+  name: "Max",
+  age: 39,
+  greet() {
+    console.log("Hello There!");
+    return this.name;
+  },
+};
