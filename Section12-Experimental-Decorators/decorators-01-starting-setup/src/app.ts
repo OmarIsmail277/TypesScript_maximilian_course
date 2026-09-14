@@ -467,3 +467,787 @@ to give you an idea of the power that decorators can have.
 // This is one of the powerful features of class decorators:
 // they can replace the original class with a new class that
 // preserves the original functionality while adding custom logic.
+
+/* --- my notes ---
+
+
+In order to do more advanced things with decorators, you will have to note that some decorators for example, class decorators, but also
+method decorators are also capable of returning something. Now, we are returning nothing! Notice that we are not talking about the decorator function
+which gets returned in the decorator factory, but a return value inside of the decorator function itself.
+
+let's try in withTemplate function, here it's is a decorator that is added to a class, so we can return a new constructor function, which will
+replace the old one. so which it will replace the class to which you added to decorator you could say.
+*/
+
+function withTemplate2(template: string, hookId: string) {
+  console.log("TEMPLATE FACTORY");
+  return function <T extends { new (...args: any[]): { name: string } }>(
+    oringinalConstructor: T,
+  ) {
+    // just syntactic sugar
+    return class extends oringinalConstructor {
+      constructor(..._: any[]) {
+        super();
+        // any logic, for example we can move the template rendering logic above
+        console.log("Rendering Template! 😎");
+        const hookEl = document.getElementById(hookId);
+        if (hookEl) {
+          hookEl.innerHTML = template;
+          hookEl.querySelector("h1")!.textContent = this.name;
+        }
+      }
+    };
+  };
+}
+
+/*
+So, now what we are trying to do is, trying to replace the class, (the constructor function to which we added our decorator) --> with a new class,
+with a new constructor function, where I still execute the old logic, but where I also add my own new logic, and therefore now the template
+should actually only be rendered to the dom if I really instantiate my object here, and not all the time... (not when the decorator function is executed)
+which as we learned happenssss as soon as we define the class. 
+
+
+now, also, a little tweak here, we don't call our original constructor in here anymore, instead we can just access this.name to get the name property value
+of the instance we are creating
+
+
+
+*/
+
+// lecture 10
+
+/*
+We saw how we can build quite amazing things
+
+with decorators, decorator factories and then also
+
+by utilizing the return values of decorators
+
+which in the examples,
+
+the class decorator allows us to
+
+basically replace the class we added the decorator to
+
+with a class that is totally different,
+
+that builds up on the existing class, like in our case
+
+and that therefore might add some functionalities.
+
+Now you can return values in other decorators too
+
+but not in all of them.
+
+Or not in all them the return value is respected.
+
+Now, decorators where you can return something
+
+are the decorators you can add to methods
+
+and the decorators you add to accessors.
+
+So here on the setter log 2 and log 3 on the method
+
+these two decorators, log 2 and log 3 these also could
+
+return something and TypeScript would use it.
+
+The decorators on properties and on parameters
+
+of course, also can return something
+
+but TypeScript will ignore it.
+
+So return values are not supported there
+
+or are not used to be precise.
+
+Now what can you return on log 3?
+
+So on method decorators and on log 2,
+
+so on accessor decorators though.
+
+You can return a brand new property descriptor.
+
+Log 2 and log 3, which are the two decorators
+
+I'm talking about, right?
+
+Log 2 and log 3, both get the descriptor off the property,
+
+off the method, you could say, they are attached to.
+
+Because an accessor is kind of like a method,
+
+you have a function that gets executed there.
+
+Now the property descriptor is a JavaScript thing,
+
+as you know, if we have a look at this page again
+
+and we reload it we see that, for example
+
+for our accessor decorator,
+
+the property descriptor is this object here which has
+
+the configurable and enumerable
+
+and get and set properties.
+
+And for the method decorator our descriptor is
+
+this object here which also has
+
+configurable, enumerable, value and writable.
+
+And this is vanilla JavaScript.
+
+You have property descriptors in vanilla JavaScript as well.
+
+They allow you to define a property in more detail.
+
+You can of course assign a value to a property
+
+and since we're talking about a method,
+
+the value is a function in this case
+
+but you can also control whether it's writable
+
+so if it can be changed after it has been created,
+
+after the object has been created.
+
+Whether it's configurable,
+
+so if you can change it's
+
+configuration and if you can delete this property.
+
+And if it's enumerable,
+
+which means if it shows up when you loop
+
+through your object for example.
+
+And therefore a method for example
+
+by default this is set to false so that
+
+if you use a for in loop on an object
+
+this method is not printed as a property.
+
+For an accessor we also got
+
+configurable and enumerable,
+
+but we get and set and there you could of course,
+
+also, for example, return a new descriptor which
+
+assigns a brand new set method or which suddenly
+
+also adds a get functionality.
+
+So here in log 2 and log 3 you can return a new
+
+descriptor object in the end and make it clear
+
+to TypeScript that you will do so by returning
+
+or by setting the return type to property descriptor
+
+and there you can therefore also set the set keyword,
+
+the get keyword, the configurable or the
+
+enumerable property and change how this accessor
+
+or method is configured.
+
+Now I don't wanna do that here for the accessor,
+
+there's nothing interesting I could do with it
+
+therefore I will not return a property descriptor,
+
+but I will actually show you an example with the method
+
+decorator where we will return something and we can build
+
+interesting with the help of decorators.
+
+*/
+
+// lecture 11
+// so, we can return something on method decorators, and that something should be a descriptor, which allows us to change the method or
+// change the configuration of the method.
+
+// first add a simple button in html
+
+//then
+
+class Printer {
+  message = "This works!";
+
+  @Autobind
+  showMessage() {
+    console.log(this.message);
+  }
+}
+
+const p = new Printer();
+
+const button = document.querySelector("button")!;
+button.addEventListener("click", p.showMessage);
+
+/*
+
+Now, if we save that,
+
+and we go back to our page and I click on this button,
+
+we get undefined here, though,
+
+we don't get our message being shown.
+
+And the reason for that is that with an event listener,
+
+if we point at a function that should be executed
+
+the this keyword inside of that function
+
+will not have the same context or reference
+
+as it has if we call just p.ShowMessage,
+
+in this case, this would refer to the printer.
+
+No, in the scenario here where we use an event listener,
+
+this will refer to the target of the event,
+
+because addEventListener in the end binds this
+
+in the function which is to be executed
+
+to the target of the event.
+
+And of course, I don't want this.
+
+Now, a common workaround here
+
+would be to use the bind method
+
+and bind showMessage to p, or bind this in showMessage to p
+
+so that when this executes, this is not referring
+
+to what addEventListener wants it to refer to
+
+but instead this inside of showMessage
+
+will refer to this p, to this object here again.
+
+And if we're now, if we reload here
+
+and I clear this again, now we see this works!
+
+Now, that is all default JavaScript.
+*/
+
+// Now, we will build a decorator, which we can add to this method, which will automatically bind this to the surrounding class,
+// so to the object, this method belongs to, every time it's called, no matter where we call it.
+
+// couple of arguments =>
+// target: any => it's either the prototype of the object we're working with
+// or its constructor function if we would be adding this to a static method,
+// but here it will be the prototype because we will add it to an instance method,
+
+// then we have the methodName, a string or a symbol, maybe number of course
+// last descriptor => propertyDescriptor
+function Autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
+  // we get the originalMethod like this
+  const originalMethod = descriptor.value;
+  const adjustedDescriptor: PropertyDescriptor = {
+    configurable: true,
+    enumerable: false,
+    get() {
+      // again, the getter is basically like having a value property with extra logic that runs before the value is returned
+      /*
+      And now the big question, of course,
+
+is what does this refer to in here?
+
+Keep in mind it's inside of this getter method
+
+so this will refer to whatever is responsible
+
+for triggering this getter method.
+
+And that's the trick now,
+
+the getter method will be triggered
+
+by the concrete object to which it belongs,
+
+so this inside of the getter method
+
+will always refer to the object
+
+on which we defined the getter.
+
+This will not be overwritten by addEventListener
+
+because the getter is like an extra layer
+
+between our function that's being executed
+
+and the object to which it belongs
+
+and the Event Listener.
+
+So therefore, this in here will refer
+
+to the object on which we originally defined the method.
+
+So we can safely bind this for the original method
+
+and ensure that now this inside of the original method
+
+will also refer to the exact same object.
+      */
+      const boundFn = originalMethod.bind(this);
+      return boundFn;
+    },
+  };
+  return adjustedDescriptor;
+}
+
+/*
+Now I will return the bound function here
+
+and thereafter, outside of this adjusted descriptor,
+
+return the adjusted descriptor.
+
+So that's our decorator function,
+
+returning a new descriptor object,
+
+and therefore this descriptor object
+
+will override the old descriptor,
+
+that is what TypeScript will do with it.
+
+TypeScript will then replace the old methods descriptor,
+
+so the old methods configuration
+
+with this new configuration here,
+
+which added this extra getter layer.
+*/
+
+// change target and methodName to _,because not interested in them
+
+/*
+And now let's have a look at that,
+
+let's click Click Me, and you should see This Works!
+
+If I reload, this works.
+
+Because this is now bound correctly.
+
+And just to verify that it's really our decorator
+
+that makes a difference here,
+
+if I would remove the binding here
+
+in my getter and the decorator
+
+and I save that, you see that if it is now reloads
+
+and we click Click me, we see undefined again.
+
+So it's really this extra getter layer
+
+which does its work here
+
+which ensures that this is always bound correctly
+
+no matter how you call showMessage.
+
+If we called it like this directly on the object
+
+it will work, if we call it here like this
+
+with an event listener, it also works.
+
+So you see this works here,
+
+which in the end is coming from this showMessage call
+
+and then you also see it works if I click on the button.
+
+So this is one neat example
+
+of how you can utilize decorators
+
+to build a quite amazing functionality
+
+and save you the hassle of manually calling bind everywhere.
+
+Instead, you just bind it like this.
+ */
+
+// lecture 11 - validation with decorators
+
+// class Course {
+//   @Required
+//   title: string;
+//   @PositiveNumber
+//   price: number;
+
+//   constructor(t: string, p: number) {
+//     this.title = t;
+//     this.price = p;
+//   }
+// }
+
+/*
+
+Now, of course now when we want to instantiate this course,
+
+we have to pass in a valid title and a valid price.
+
+But one common scenario you might encounter
+
+in some applications is that you fetch data,
+
+let's say from a web resource and you get data where
+
+you guess you have a couple of courses let's say,
+
+but you don't know for sure.
+
+Or, another possible scenario, you let users enter the data
+
+and you simply want to assign that data
+
+and trade a new course with the user-entered data
+
+and you assume it's right, but you are not guaranteed
+
+that it's right and therefore you want
+
+to validate the input.
+
+That's the scenario I wanna fake here.
+*/
+
+// add a simple form in html
+
+/*
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Understanding TypeScript</title>
+    <script src="dist/app.js" defer></script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <button>Click me</button>
+    <form>
+      <input type="text" placeholder="Course title" id="title" />
+      <input type="text" placeholder="Course price" id="price" />
+      <button type="submit">Save</button>
+    </form>
+  </body>
+</html>
+ */
+
+const courseForm = document.querySelector("form")!;
+
+courseForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const titleEl = document.getElementById("title") as HTMLInputElement;
+  const priceEl = document.getElementById("price") as HTMLInputElement;
+
+  const title = titleEl.value;
+  const price = +priceEl.value;
+
+  const createdCourse = new Course(title, price);
+  console.log(createdCourse);
+
+  if (!validate(createdCourse)) {
+    alert("invalid input, please try again!");
+    return;
+  }
+  console.log(createdCourse);
+});
+
+/*
+Now, unfortunately this only works though if
+
+I don't enter anything.
+
+If I now click save, we see this course is created.
+
+Now, this technically is a valid course
+
+but of course, it's not really valid for our application.
+
+We probably wanna have a title which is not empty
+
+and a price which is greater than zero.
+
+So we wanna add validation.
+
+Of course we can simply add a if check here
+
+and check if title, trim, length is greater than zero,
+
+which means it is not empty
+
+and where we also validate the price.
+
+But that means that whenever we create a new course,
+
+we have to add the validation logic here before we add it.
+
+Wouldn't it be nice if the validation logic
+
+would be included in the course class,
+
+with the help of decorators, maybe?
+
+And that's exactly what I wanna do here.
+*/
+
+// function Required() {}
+// function PositiveNumber() {}
+// function validate(obj: object) {}
+
+/*
+Now I will only provide a basic idea
+
+of how we could implement this,
+
+in the next module I will show you an example package
+
+which does this in a way more elaborate way
+
+and which we then will all use there
+
+to play around with it a bit.
+
+Now however here I want to implement
+
+this with my own decorators
+
+and I will add a decorator required here
+
+and we'll add another decorator function
+
+which I'll name PositiveNumber.
+
+So I got two decorators here.
+
+And now my idea is that we can add them here
+
+to our properties, for example Required in front of title,
+
+and positiveNumber in front of the price and typescript kind
+
+of registers this somewhere and then
+
+we got a third function, validate to which we can pass
+
+a object so any object and typescript then has a look
+
+at the project, finds any validation we registered
+
+on this class for this object earlier
+
+and applies our validation logic.
+
+That's the idea I have here.
+
+So, this could be part of a third-party library
+
+we're exposing to you and then you just import required
+
+positive number and validate to first set up the validators
+
+and then at some point call validate.
+
+So for example here when we created the course,
+
+we can call validate and pass in the createdCourse
+
+and if this is not true, so let's say
+
+this should return true or false,
+
+if this is not true, then we throw an error
+
+or show an alert, invalid input please try again
+
+and only otherwise we continue.
+
+So that's my idea.
+
+That we can call validate, this returns true or false.
+
+True if it's valid, false if it's not valid
+
+and we can therefore use the result.
+
+So therefore we get a couple of things to do.
+
+We need to make sure that when we add a decorator here,
+
+this is somehow stored somewhere.
+
+Again, keep in mind this could be part
+
+of our own third-party library,
+
+so in there we could have some kind of storage
+
+that's stores that for this class and this title property
+
+for example, we want it to be required.
+
+And in validate, we can then check if in the storage
+
+for the object we got, for the class the object is based on
+
+we do have a validator registered for the title,
+
+for the price and so on.
+
+And we then run our validation logic.
+
+That's my idea here.
+
+
+ */
+
+// lecture 12 - Validation with Decorators - Finished
+
+interface ValidatorConfig {
+  [property: string]: {
+    [validatableProp: string]: string[]; // ["required", "positive"]
+  };
+}
+
+const registeredValidators: ValidatorConfig = {};
+
+function Required(target: any, propName: string) {
+  registeredValidators[target.constructor.name] = {
+    ...registeredValidators[target.constructor.name],
+    [propName]: ["required"],
+    /*Now of course this is a very naive validator.
+
+If we had other validators registered
+
+for this property already, I would now overwrite it here.
+
+So it would be better to first retrieve
+
+any existing validators and then copy them into this array
+
+and only add required to that existing array.
+
+Again, to save some time here,
+
+and to just show the general idea,
+
+I will have this more naive approach here. */
+  };
+}
+
+function PositiveNumber(target: any, propName: string) {
+  registeredValidators[target.constructor.name] = {
+    ...registeredValidators[target.constructor.name],
+    [propName]: ["required"],
+  };
+}
+
+function validate(obj: any) {
+  const objVaidatorConfig = registeredValidators[obj.constructor.name];
+  if (!objVaidatorConfig) return true;
+
+  let isValid = true;
+
+  for (const prop in objVaidatorConfig) {
+    console.log(prop);
+    for (const validator of objVaidatorConfig[prop]) {
+      switch (validator) {
+        case "required":
+          isValid = isValid && !!obj[prop];
+          break;
+        case "positive":
+          isValid = isValid && obj[prop] > 0;
+          break;
+      }
+    }
+  }
+  return isValid;
+}
+
+class Course {
+  @Required
+  title: string;
+  @PositiveNumber
+  price: number;
+
+  constructor(t: string, p: number) {
+    this.title = t;
+    this.price = p;
+  }
+}
+
+/*
+And therefore this now looks good to me
+
+and this is now our first naive implementation
+
+of how such a validator could work
+
+with the help of TypeScript decorators.
+
+And keep in mind that all of that here,
+
+all the decorators, the validate function and the registry,
+
+would be hidden away from you.
+
+That could be part of a third party library
+
+which you're working on,
+
+of course in a more elaborate way than probably
+
+which you share with your end users.
+
+And you, as a end user, would just import these things,
+
+add these decorators, and call validate,
+
+and you would have a very convenient way
+
+of adding validation to your classes then.
+*/
