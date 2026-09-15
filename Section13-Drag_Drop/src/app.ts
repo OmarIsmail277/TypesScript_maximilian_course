@@ -60,13 +60,42 @@ class ProjectInput {
     this.attach();
   }
 
+  private gatherUserInput(): [string, string, number] | void {
+    const enteredTitle = this.titleInputElement.value;
+    const enteredDescription = this.descriptionInputElement.value;
+    const enteredPeople = this.peopleInputElement.value;
+
+    // think how we can come with a smarter validation solution (outsource it into a separate validation function
+    // which is configurable and how types could help you here)
+    if (
+      enteredTitle.trim().length === 0 ||
+      enteredDescription.trim().length === 0 ||
+      enteredPeople.trim().length === 0
+    ) {
+      alert("Invalid Input, please try again!");
+      return;
+    } else return [enteredTitle, enteredDescription, +enteredPeople];
+  }
+
+  private clearInputs() {
+    this.titleInputElement.value = "";
+    this.descriptionInputElement.value = "";
+    this.peopleInputElement.value = "";
+  }
+
   // this method should trigger whenever the form is submitted
   @autobind
   private submitHandler(event: Event) {
     // get access to the input values, validate them, then do something with them (later)
     event.preventDefault();
+    // gather all our input values, quickly validate them and then do something with them
+    const userInput = this.gatherUserInput();
 
-    console.log(this.titleInputElement.value);
+    if (Array.isArray(userInput)) {
+      const [title, desc, people] = userInput;
+      console.log(title, desc, people);
+      this.clearInputs();
+    }
   }
 
   // add a listener to our form - Sets up behavior
