@@ -2,7 +2,7 @@
   "compilerOptions": {
     /* Basic Options */
     "target": "es6" /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017','ES2018' or 'ESNEXT'. */,
-    "module": "es6" /* Specify module code generation: 'none', 'commonjs', 'es2015', or 'ESNext'. ('amd', 'system', 'umd' were removed in TS 7.0) */,
+    "module": "ESNext" /* Specify module code generation: 'none', 'commonjs', 'es2015', or 'ESNext'. ('amd', 'system', 'umd' were removed in TS 7.0) */,
     "lib": [
       "dom",
       "es6",
