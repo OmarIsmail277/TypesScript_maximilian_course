@@ -1,10 +1,28 @@
+### Get all todos
 GET http://localhost:3000/todos
 
-###
-
+### Add a new todo
+# @name addTodo
 POST http://localhost:3000/todos
 Content-Type: application/json
 
 {
-    "text":"Some new todo..."
+    "text": "Some new todo..."
 }
+
+### Get the todo we just created (uses the id from addTodo's response)
+GET http://localhost:3000/todos/{{addTodo.response.body.todo.id}}
+
+### Update the todo we just created
+PATCH http://localhost:3000/todos/{{addTodo.response.body.todo.id}}
+Content-Type: application/json
+
+{
+    "text": "Updated todo text"
+}
+
+### Delete the todo we just created
+DELETE http://localhost:3000/todos/{{addTodo.response.body.todo.id}}
+
+### Get a todo that doesn't exist (should error - no 404 handling yet)
+GET http://localhost:3000/todos/999999
