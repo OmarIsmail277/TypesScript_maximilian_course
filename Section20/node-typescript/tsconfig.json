@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    // Which JS version to compile down to (ES2022 supports top-level await, class fields, etc.)
+    "target": "es2022",
+
+    // Allows default imports from CommonJS modules (e.g. `import express from "express"`)
+    // instead of requiring `import * as express from "express"`
+    "esModuleInterop": true,
+
+    // Skips type-checking of .d.ts files (speeds up compilation, avoids errors from third-party types)
+    "skipLibCheck": true,
+
+    // Module system to emit. NodeNext matches Node's native ESM/CJS resolution rules
+    // based on package.json "type" and file extensions
+    "module": "NodeNext",
+
+    // Output directory for compiled .js files
+    "outDir": "dist",
+
+    // Built-in type definitions to include (matches the "target" JS version's global APIs)
+    "lib": ["es2022", "dom"],
+
+    // Enables all strict type-checking options (noImplicitAny, strictNullChecks, etc.)
+    "strict": true
+  }
+}

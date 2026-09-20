@@ -1,0 +1,15 @@
+{
+  "name": "typescript",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "compile": "tsc",
+    "start": "node dist/app.js"
+  },
+  "keywords": [],
+  "devDependencies": {
+    "typescript": "^7.0.2"
+  }
+}
