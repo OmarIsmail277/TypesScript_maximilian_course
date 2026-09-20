@@ -1,8 +1,11 @@
+import Header from "./components/Header";
+import goalsImage from "./assets/goals.jpg";
+
 function App() {
   return (
-    <>
-      <h1>Welcome to React!</h1>
-    </>
+    <main>
+      <Header image={{ src: goalsImage, alt: "a list of goals" }}></Header>
+    </main>
   );
 }
 
