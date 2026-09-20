@@ -20,6 +20,9 @@
     // Built-in type definitions to include (matches the "target" JS version's global APIs)
     "lib": ["es2022", "dom"],
 
+    // Ambient @types packages to include globally (Node globals/APIs like process, Buffer, node:http)
+    "types": ["node"],
+
     // Enables all strict type-checking options (noImplicitAny, strictNullChecks, etc.)
     "strict": true
   }
